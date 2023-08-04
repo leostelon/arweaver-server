@@ -13,6 +13,9 @@ app.use(express.static(__dirname));
 // Database
 // require("./polybase");
 
+const { Subscribe } = require("./subscriber.js");
+new Subscribe({ indexingCycle: 1233889 });
+
 // CORS
 app.use(function (req, res, next) {
 	res.setHeader("Access-Control-Allow-Origin", "*");
