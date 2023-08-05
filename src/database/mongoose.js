@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const url = process.env.MONGODB_URL || "mongodb://localhost:27017/arweave";
+const url = process.env.MONGODB_URL || "mongodb://0.0.0.0:27017/arweave";
 
 mongoose.set("strictQuery", true); // TODO
 

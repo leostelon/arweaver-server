@@ -7,8 +7,8 @@ const NotificationSchema = new mongoose.Schema(
 			required: true,
 			default: " ",
 		},
-		user_id: {
-			type: mongoose.Types.ObjectId,
+		user_address: {
+			type: String,
 			required: true,
 		},
 	},
