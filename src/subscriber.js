@@ -1,4 +1,10 @@
 const { default: axios } = require("axios");
+const Arweave = require("arweave");
+const arweave = Arweave.init({
+	host: "arweave.net",
+	port: 443,
+	protocol: "https",
+});
 
 function timeout(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -7,6 +13,7 @@ function timeout(ms) {
 class Subscribe {
 	_currentBlock = 1233889;
 	_indexingCycle;
+	_lastIndexedCycle;
 
 	constructor({ indexingCycle = 0 }) {
 		this._initiate(indexingCycle);
@@ -24,23 +31,37 @@ class Subscribe {
 		try {
 			while (true) {
 				this._currentCycle = await this._getCurrentCycle();
-				console.log(
-					`INDEXING CYCLE: ${this._indexingCycle}; NETWORK CYCLE: ${this._currentCycle}`
-				);
 
 				if (this._indexingCycle < this._currentCycle) {
 					this._indexingCycle += 1;
 				}
+				console.log(
+					`INDEXING CYCLE: ${this._indexingCycle}; NETWORK CYCLE: ${this._currentCycle}`
+				);
 
-				if (this._indexingCycle >= this._currentCycle) {
-					await timeout(60 * 1000);
+				if (this._lastIndexedCycle === this._indexingCycle) {
+					console.log("LAST INDEXED:", this._indexingCycle);
+					await timeout(5 * 1000);
+				} else {
+					// Get current block details
+					const block = await arweave.blocks.getByHeight(this._indexingCycle);
+
+					// Get transactions details
+					const transactions = await this._getTransactions(block.txs);
+					console.log(transactions.length);
+
+					this._lastIndexedCycle = this._indexingCycle;
+
+					if (this._indexingCycle >= this._currentCycle) {
+						await timeout(5 * 1000);
+					}
 				}
 			}
 		} catch (error) {
 			console.log(error);
 			console.log({ LISTENER_LISTEN: error.message });
 			if (this._indexingCycle >= this._currentCycle) {
-				await timeout(60 * 1000);
+				await timeout(5 * 1000);
 			}
 			this._listenForCycle();
 		}
@@ -50,6 +71,48 @@ class Subscribe {
 		let cycle = await axios.get("https://arweave.net/height");
 		this._currentCycle = cycle.data;
 		return this._currentCycle;
+	}
+
+	async _getTransactions(transactions) {
+		try {
+			let data = JSON.stringify({
+				query: `query getEntity($ids: [ID!]) {
+				transactions(ids: $ids, first: 100) {
+					edges {
+						node {
+							id,
+							recipient,
+							__typename,
+							tags{
+								name,
+								value
+							},
+							owner{
+								address
+							}
+						}
+					}
+				}
+			}`,
+				variables: { ids: transactions },
+			});
+
+			let config = {
+				method: "post",
+				maxBodyLength: Infinity,
+				url: "https://arweave.net/graphql",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				data: data,
+			};
+			const response = await axios.request(config);
+
+			return response.data.data.transactions.edges;
+		} catch (error) {
+			console.log(error.response.data);
+			console.log({ LISTENER_TRANSACTIONS: error.message });
+		}
 	}
 }
 
