@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 // Import env
 require("dotenv").config({
@@ -11,10 +12,15 @@ const app = express();
 app.use(express.static(__dirname));
 
 // Database
-// require("./polybase");
+require("./database/mongoose");
+
+const models = path.join(__dirname, "models");
+fs.readdirSync(models)
+	.filter((file) => ~file.search(/^[^.].*\.js$/))
+	.forEach((file) => require(path.join(models, file)));
 
 const { Subscribe } = require("./subscriber.js");
-new Subscribe({ indexingCycle: 1233889 });
+new Subscribe({ indexingCycle: 0 });
 
 // CORS
 app.use(function (req, res, next) {
