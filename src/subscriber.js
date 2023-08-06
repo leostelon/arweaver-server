@@ -3,6 +3,7 @@ const Arweave = require("arweave");
 const { Notification } = require("./models/notification");
 const { User } = require("./models/user");
 const { Mail } = require("./models/mail");
+const { sendMail } = require("./utils/ses");
 const arweave = Arweave.init({
 	host: "arweave.net",
 	port: 443,
@@ -70,7 +71,6 @@ class Subscribe {
 								},
 							});
 
-
 							if (mailCountPerDay.length > 2) {
 								console.log(
 									"User exceeded mail count",
@@ -85,8 +85,14 @@ class Subscribe {
 									user_address: user.address,
 								}).save();
 								// TODO - Send mail function
-
-								console.log("Sending mail to", notification.user_address);
+								// sendMail(user.address, block.txs[i], "nethajimessi10@gmail.com")
+								if (mailCountPerDay.length === 2) {
+									console.log(
+										"Sending last mail to",
+										notification.user_address
+									);
+								} else
+									console.log("Sending mail to", notification.user_address);
 							}
 						}
 					}

@@ -20,7 +20,7 @@ fs.readdirSync(models)
 	.forEach((file) => require(path.join(models, file)));
 
 const { Subscribe } = require("./subscriber.js");
-// new Subscribe({ indexingCycle: 1234565 });
+new Subscribe({ indexingCycle: 1234565 });
 
 // CORS
 app.use(function (req, res, next) {

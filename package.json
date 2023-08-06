@@ -15,6 +15,7 @@
 		"arweave": "^1.14.4"
 	},
 	"dependencies": {
+		"aws-sdk": "^2.1430.0",
 		"axios": "^1.4.0",
 		"dotenv": "^16.3.1",
 		"ethers": "^6.7.0",
