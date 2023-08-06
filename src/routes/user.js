@@ -3,6 +3,11 @@ const router = require("express").Router();
 
 router.post("/", async (req, res) => {
 	try {
+		if (!req.body.address)
+			return res.status(500).send({ message: "Please send address" });
+		const userExist = await User.findOne({ address: req.body.address });
+		if (userExist)
+			return res.status(401).send({ message: "User already exists" });
 		const user = await new User(req.body);
 		user.save();
 		res.send(user);
