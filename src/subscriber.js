@@ -120,40 +120,45 @@ class Subscribe {
 
 	async _getTransactions(transactions) {
 		try {
-			let data = JSON.stringify({
-				query: `query getEntity($ids: [ID!]) {
-				transactions(ids: $ids, first: 100) {
-					edges {
-						node {
-							id,
-							recipient,
-							__typename,
-							tags{
-								name,
-								value
-							},
-							owner{
-								address
+			let txs = [];
+			for (var i = 0; i < transactions.length / 100; i++) {
+				let ar = transactions.slice(i * 100, (i + 1) * 100);
+				let data = JSON.stringify({
+					query: `query getEntity($ids: [ID!]) {
+						transactions(ids: $ids, first: 100) {
+							edges {
+								node {
+									id,
+									recipient,
+									__typename,
+									tags{
+										name,
+										value
+									},
+									owner{
+										address
+									}
+								}
 							}
 						}
-					}
-				}
-			}`,
-				variables: { ids: transactions },
-			});
+					}`,
+					variables: { ids: ar },
+				});
 
-			let config = {
-				method: "post",
-				maxBodyLength: Infinity,
-				url: "https://arweave.net/graphql",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				data: data,
-			};
-			const response = await axios.request(config);
+				let config = {
+					method: "post",
+					maxBodyLength: Infinity,
+					url: "https://arweave.net/graphql",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					data: data,
+				};
+				const response = await axios.request(config);
 
-			return response.data.data.transactions.edges;
+				txs.push(...response.data.data.transactions.edges);
+			}
+			return txs;
 		} catch (error) {
 			console.log({ LISTENER_TRANSACTIONS: error.message });
 		}
