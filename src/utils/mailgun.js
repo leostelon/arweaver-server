@@ -14,8 +14,8 @@ async function sendMail(walletAddress, txHash, toEmail, lastMail) {
 				to: [toEmail],
 				subject: "Transaction alert⚠️",
 				text: "Transaction Notification",
-				html: `There was a transaction related to ${walletAddress}, you can check the
-                    transaction by click this
+				html: `There was a transaction related to 
+					<span style="font-weight:bold;">${walletAddress}</span>, you can check the transaction by clicking this
                     <span>
                         <a
                             class="ulink"
@@ -23,11 +23,11 @@ async function sendMail(walletAddress, txHash, toEmail, lastMail) {
                             target="_blank"
                             >link</a
                         >
-                    </span>
+                    </span>.
                     <br>
                     ${
 											lastMail
-												? "<h6>Daily qoute limit of 5 has been touched, this is the last notification email for today.</h6>"
+												? "<h4>⚠️Daily qoute limit of 5 has been touched, this is the last notification email for today.⚠️</h4>"
 												: ""
 										}`,
 			})

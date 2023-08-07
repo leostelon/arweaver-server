@@ -34,7 +34,6 @@ class Subscribe {
 	async _listenForCycle() {
 		try {
 			while (true) {
-				if (this._currentCycle >= 1234566) return;
 				this._currentCycle = await this._getCurrentCycle();
 
 				if (this._indexingCycle < this._currentCycle) {
@@ -84,10 +83,9 @@ class Subscribe {
 									email: user.email,
 									user_address: user.address,
 								}).save();
-								// TODO - Send mail function
 								sendMail(
 									user.address,
-									block.txs[i],
+									txs[i].node.id,
 									user.email,
 									mailCountPerDay.length === 4
 								);
