@@ -9,8 +9,8 @@ const mg = mailgun.client({
 async function sendMail(walletAddress, txHash, toEmail, lastMail) {
 	try {
 		mg.messages
-			.create("arweaver.xyz", {
-				from: "Arweaver <postmaster@arweaver.xyz>",
+			.create("mail.arweaver.xyz", {
+				from: "Arweaver <postmaster@mail.arweaver.xyz>",
 				to: [toEmail],
 				subject: "Transaction alert⚠️",
 				text: "Transaction Notification",
