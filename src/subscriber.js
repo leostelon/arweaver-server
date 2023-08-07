@@ -60,7 +60,7 @@ class Subscribe {
 					// Transmit Notifications
 					for (var i = 0; i < txs.length; i++) {
 						const notification = await Notification.findOne({
-							user_address: txs[i].node.owner.address,
+							address: txs[i].node.owner.address,
 						});
 						if (notification) {
 							const mailCountPerDay = await Mail.find({
@@ -78,7 +78,7 @@ class Subscribe {
 								);
 							} else {
 								const user = await User.findOne({
-									address: notification.user_address,
+									address: notification.creator_address,
 								});
 								await new Mail({
 									email: user.email,
@@ -89,10 +89,10 @@ class Subscribe {
 								if (mailCountPerDay.length === 2) {
 									console.log(
 										"Sending last mail to",
-										notification.user_address
+										notification.address
 									);
 								} else
-									console.log("Sending mail to", notification.user_address);
+									console.log("Sending mail to", notification.address);
 							}
 						}
 					}

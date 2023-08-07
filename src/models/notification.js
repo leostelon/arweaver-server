@@ -7,7 +7,11 @@ const NotificationSchema = new mongoose.Schema(
 			required: true,
 			default: " ",
 		},
-		user_address: {
+		creator_address: {
+			type: String,
+			required: true,
+		},
+		address: {
 			type: String,
 			required: true,
 		},
