@@ -10,7 +10,7 @@ AWS.config.update({
 });
 var ses = new AWS.SES();
 
-async function sendMail(walletAddress, txHash, toEmail) {
+async function sendMailSes(walletAddress, txHash, toEmail) {
 	try {
 		ses.sendEmail(
 			{
@@ -38,4 +38,4 @@ async function sendMail(walletAddress, txHash, toEmail) {
 	}
 }
 
-module.exports = { sendMail };
+module.exports = { sendMailSes };

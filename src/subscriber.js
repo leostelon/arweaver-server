@@ -3,7 +3,7 @@ const Arweave = require("arweave");
 const { Notification } = require("./models/notification");
 const { User } = require("./models/user");
 const { Mail } = require("./models/mail");
-const { sendMail } = require("./utils/ses");
+const { sendMail } = require("./utils/mailgun");
 const arweave = Arweave.init({
 	host: "arweave.net",
 	port: 443,
@@ -64,17 +64,17 @@ class Subscribe {
 						});
 						if (notification) {
 							const mailCountPerDay = await Mail.find({
-								user_address: txs[i].node.owner.address,
+								user_address: notification.creator_address,
 								createdAt: {
 									$gt: new Date(new Date().toDateString()),
 									$lt: new Date(nextDay.toDateString()),
 								},
 							});
 
-							if (mailCountPerDay.length > 2) {
+							if (mailCountPerDay.length > 4) {
 								console.log(
 									"User exceeded mail count",
-									txs[i].node.owner.address
+									notification.creator_address
 								);
 							} else {
 								const user = await User.findOne({
@@ -85,14 +85,15 @@ class Subscribe {
 									user_address: user.address,
 								}).save();
 								// TODO - Send mail function
-								// sendMail(user.address, block.txs[i], "nethajimessi10@gmail.com")
-								if (mailCountPerDay.length === 2) {
-									console.log(
-										"Sending last mail to",
-										notification.address
-									);
-								} else
-									console.log("Sending mail to", notification.address);
+								sendMail(
+									user.address,
+									block.txs[i],
+									user.email,
+									mailCountPerDay.length === 4
+								);
+								if (mailCountPerDay.length === 4) {
+									console.log("Sending last mail to", notification.address);
+								} else console.log("Sending mail to", notification.address);
 							}
 						}
 					}
@@ -105,7 +106,6 @@ class Subscribe {
 				}
 			}
 		} catch (error) {
-			console.log(error);
 			console.log({ LISTENER_LISTEN: error.message });
 			if (this._indexingCycle >= this._currentCycle) {
 				await timeout(5 * 1000);
@@ -158,7 +158,6 @@ class Subscribe {
 			return response.data.data.transactions.edges;
 		} catch (error) {
 			console.log({ LISTENER_TRANSACTIONS: error.message });
-			console.log(error.response.data);
 		}
 	}
 }
