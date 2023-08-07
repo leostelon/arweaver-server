@@ -16,6 +16,21 @@ router.post("/", async (req, res) => {
 	}
 });
 
+router.post("/updateemail", async (req, res) => {
+	try {
+		if (!req.body.address)
+			return res.status(500).send({ message: "Please send address" });
+		const user = await User.findOne({ address: req.body.address });
+		if (!user)
+			return res.status(401).send({ message: "Invalid user address." });
+		user.email = req.body.email;
+		user.save();
+		res.send(user);
+	} catch (error) {
+		res.status(500).send({ message: error.message });
+	}
+});
+
 router.get("/:address", async (req, res) => {
 	try {
 		const user = await User.findOne({ address: req.params.address });
