@@ -35,4 +35,15 @@ router.get("/:address", async (req, res) => {
 	}
 });
 
+router.delete("/:id", async (req, res) => {
+	try {
+		const notification = await Notification.deleteOne({
+			_id: req.params.id,
+		});
+		res.send(notification);
+	} catch (error) {
+		res.status(500).send({ message: error.message });
+	}
+});
+
 module.exports = router;
