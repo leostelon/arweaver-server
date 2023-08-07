@@ -45,7 +45,7 @@ class Subscribe {
 
 				if (this._lastIndexedCycle === this._indexingCycle) {
 					console.log("LAST INDEXED:", this._indexingCycle);
-					await timeout(5 * 1000);
+					await timeout(10 * 1000);
 				} else {
 					// Get current block details
 					const block = await arweave.blocks.getByHeight(this._indexingCycle);
@@ -99,14 +99,14 @@ class Subscribe {
 					this._lastIndexedCycle = this._indexingCycle;
 
 					if (this._indexingCycle >= this._currentCycle) {
-						await timeout(5 * 1000);
+						await timeout(10 * 1000);
 					}
 				}
 			}
 		} catch (error) {
 			console.log({ LISTENER_LISTEN: error.message });
 			if (this._indexingCycle >= this._currentCycle) {
-				await timeout(5 * 1000);
+				await timeout(10 * 1000);
 			}
 			this._listenForCycle();
 		}
