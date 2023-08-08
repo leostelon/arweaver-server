@@ -87,7 +87,7 @@ class Subscribe {
 									user_address: user.address,
 								}).save();
 								sendMail(
-									user.address,
+									notifications[j].address,
 									txs[i].node.id,
 									user.email,
 									mailCountPerDay.length === 4
