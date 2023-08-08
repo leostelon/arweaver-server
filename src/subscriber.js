@@ -58,12 +58,15 @@ class Subscribe {
 
 					// Transmit Notifications
 					for (var i = 0; i < txs.length; i++) {
-						const notification = await Notification.findOne({
-							address: txs[i].node.owner.address,
+						const notifications = await Notification.find({
+							$or: [
+								{ address: txs[i].node.recipient },
+								{ address: txs[i].node.owner.address },
+							],
 						});
-						if (notification) {
+						for (var j = 0; j < notifications.length; j++) {
 							const mailCountPerDay = await Mail.find({
-								user_address: notification.creator_address,
+								user_address: notifications[j].creator_address,
 								createdAt: {
 									$gt: new Date(new Date().toDateString()),
 									$lt: new Date(nextDay.toDateString()),
@@ -73,11 +76,11 @@ class Subscribe {
 							if (mailCountPerDay.length > 4) {
 								console.log(
 									"User exceeded mail count",
-									notification.creator_address
+									notifications[j].creator_address
 								);
 							} else {
 								const user = await User.findOne({
-									address: notification.creator_address,
+									address: notifications[j].creator_address,
 								});
 								await new Mail({
 									email: user.email,
@@ -90,8 +93,8 @@ class Subscribe {
 									mailCountPerDay.length === 4
 								);
 								if (mailCountPerDay.length === 4) {
-									console.log("Sending last mail to", notification.address);
-								} else console.log("Sending mail to", notification.address);
+									console.log("Sending last mail to", notifications[j].address);
+								} else console.log("Sending mail to", notifications[j].address);
 							}
 						}
 					}
